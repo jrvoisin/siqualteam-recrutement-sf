@@ -15,6 +15,8 @@ use App\Entity\Comment;
 use App\Entity\Post;
 use App\Event\CommentCreatedEvent;
 use App\Form\CommentType;
+use App\Repository\CommentRepository;
+use App\Repository\ConfigRepository;
 use App\Repository\PostRepository;
 use App\Repository\TagRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -80,7 +82,15 @@ class BlogController extends AbstractController
         //
         // dump($post, $this->getUser(), new \DateTime());
 
-        return $this->render('blog/post_show.html.twig', ['post' => $post]);
+        $i = 0;
+
+        foreach ($post->getComments() as $value) {
+            
+            if ($value->getAllowed()) $i++;
+
+        }
+
+        return $this->render('blog/post_show.html.twig', ['post' => $post, 'nb_allowed_comments' => $i]);
     }
 
     /**
@@ -92,8 +102,11 @@ class BlogController extends AbstractController
      * (postSlug) doesn't match any of the Doctrine entity properties (slug).
      * See https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html#doctrine-converter
      */
-    public function commentNew(Request $request, Post $post, EventDispatcherInterface $eventDispatcher): Response
+    public function commentNew(CommentRepository $comments, ConfigRepository $configs, Request $request, Post $post, EventDispatcherInterface $eventDispatcher): Response
     {
+
+        $config = $configs->findConfig();
+
         $comment = new Comment();
         $comment->setAuthor($this->getUser());
         $post->addComment($comment);
@@ -102,6 +115,17 @@ class BlogController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $moderationLevel = $config->getModerationLevel();
+
+            if ($moderationLevel === 0) $comment->setAllowed(true);
+            else if ($moderationLevel === 2) {
+
+                $nbAllowedCommentsWithAuthor = $comments->findAllowedWithAuthor($this->getUser());
+                if (count($nbAllowedCommentsWithAuthor) > 0) $comment->setAllowed(true);
+
+            }
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($comment);
             $em->flush();

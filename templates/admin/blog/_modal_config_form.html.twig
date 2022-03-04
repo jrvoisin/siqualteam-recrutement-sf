@@ -1,0 +1,23 @@
+<div class="modal fade" id="modalConfig" tabindex="-1" aria-labelledby="modalConfigLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalConfigLabel">Configuration</h3>
+            </div>
+
+            {{ form_start(form_config, {method: 'POST', action: path('admin_index')}) }}
+
+            <div class="modal-body">
+
+                {{ form_label(form_config.moderationLevel, 'Type de modération pour les commentaires :') }}
+                {{ form_widget(form_config.moderationLevel) }}
+            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-success">Valider</button>
+            </div>
+            {{ form_end(form_config) }}
+        </div>   
+    </div>
+</div>

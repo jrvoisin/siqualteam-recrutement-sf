@@ -76,8 +76,20 @@ class Comment
      */
     private $author;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default":0})
+     */
+    private $allowed;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $allowedBy;
+
     public function __construct()
     {
+        $this->allowed = false;
         $this->publishedAt = new \DateTime();
     }
 
@@ -134,5 +146,27 @@ class Comment
     public function setPost(Post $post): void
     {
         $this->post = $post;
+    }
+
+    public function getAllowed(): ?bool
+    {
+        return $this->allowed;
+    }
+
+    public function setAllowed(bool $allowed): self
+    {
+        $this->allowed = $allowed;
+
+        return $this;
+    }
+
+    public function getAllowedBy(): ?User
+    {
+        return $this->allowedBy;
+    }
+
+    public function setAllowedBy(?User $allowedBy): void
+    {
+        $this->allowedBy = $allowedBy;
     }
 }

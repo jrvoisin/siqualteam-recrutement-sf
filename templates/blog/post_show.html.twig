@@ -34,28 +34,31 @@
     </div>
 
     <h3>
-        <i class="fa fa-comments" aria-hidden="true"></i> {{ 'post.num_comments'|trans({ 'count': post.comments|length }) }}
+        <i class="fa fa-comments" aria-hidden="true"></i> {{ 'post.num_comments'|trans({ 'count': nb_allowed_comments }) }}
     </h3>
 
     {% for comment in post.comments %}
-        <div class="row post-comment">
-            <a name="comment_{{ comment.id }}"></a>
-            <h4 class="col-sm-3">
-                <strong>{{ comment.author.fullName }}</strong> {{ 'post.commented_on'|trans }}
-                {# it's not mandatory to set the timezone in localizeddate(). This is done to
-                   avoid errors when the 'intl' PHP extension is not available and the application
-                   is forced to use the limited "intl polyfill", which only supports UTC and GMT #}
-                <strong>{{ comment.publishedAt|format_datetime('medium', 'short', '', 'UTC') }}</strong>
-            </h4>
-            <div class="col-sm-9">
-                {{ comment.content|markdown_to_html|sanitize_html }}
+        {% if comment.allowed == 1 %}
+            <div class="row post-comment">
+                <a name="comment_{{ comment.id }}"></a>
+                <h4 class="col-sm-3">
+                    <strong>{{ comment.author.fullName }}</strong> {{ 'post.commented_on'|trans }}
+                    {# it's not mandatory to set the timezone in localizeddate(). This is done to
+                    avoid errors when the 'intl' PHP extension is not available and the application
+                    is forced to use the limited "intl polyfill", which only supports UTC and GMT #}
+                    <strong>{{ comment.publishedAt|format_datetime('medium', 'short', '', 'UTC') }}</strong>
+                </h4>
+                <div class="col-sm-9">
+                    {{ comment.content|markdown_to_html|sanitize_html }}
+                </div>
             </div>
-        </div>
-    {% else %}
+        {% endif %}
+    {% endfor %}
+    {% if nb_allowed_comments == 0 %}
         <div class="post-comment">
             <p>{{ 'post.no_comments'|trans }}</p>
         </div>
-    {% endfor %}
+    {% endif %}
 {% endblock %}
 
 {% block sidebar %}

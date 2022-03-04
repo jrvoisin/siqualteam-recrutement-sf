@@ -12,7 +12,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Post;
+use App\Form\ConfigType;
 use App\Form\PostType;
+use App\Repository\ConfigRepository;
 use App\Repository\PostRepository;
 use App\Security\PostVoter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -50,14 +52,32 @@ class BlogController extends AbstractController
      *     could move this annotation to any other controller while maintaining
      *     the route name and therefore, without breaking any existing link.
      *
-     * @Route("/", methods="GET", name="admin_index")
-     * @Route("/", methods="GET", name="admin_post_index")
+     * @Route("/", methods="GET|POST", name="admin_index")
+     * @Route("/", methods="GET|POST", name="admin_post_index")
      */
-    public function index(PostRepository $posts): Response
+    public function index(Request $request, ConfigRepository $configs, PostRepository $posts): Response
     {
+
+        $config = $configs->findConfig();
+
+        $form_config = $this->createForm(ConfigType::class, $config);
+        $form_config->handleRequest($request);
+
+        if ($form_config->isSubmitted() && $form_config->isValid()) {
+           
+            $config->setModerationLevel($form_config->get('moderationLevel')->getData());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($config);
+            $em->flush();
+
+            $this->addFlash('success', 'Configuration enregistrée');
+
+            return $this->redirectToRoute('admin_index');
+        }
+
         $authorPosts = $posts->findBy(['author' => $this->getUser()], ['publishedAt' => 'DESC']);
 
-        return $this->render('admin/blog/index.html.twig', ['posts' => $authorPosts]);
+        return $this->render('admin/blog/index.html.twig', ['posts' => $authorPosts, 'form_config' => $form_config->createView()]);
     }
 
     /**
