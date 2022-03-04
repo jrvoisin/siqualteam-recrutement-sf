@@ -91,6 +91,11 @@ class Comment
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $allowedAt;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $pictureFilename;
     
 
     public function __construct()
@@ -194,6 +199,18 @@ class Comment
     public function removeAllowedAt(): void
     {
         $this->allowedAt = null;
+    }
+
+    public function getPictureFilename(): ?string
+    {
+        return $this->pictureFilename;
+    }
+
+    public function setPictureFilename(?string $pictureFilename): self
+    {
+        $this->pictureFilename = $pictureFilename;
+
+        return $this;
     }
 
 }

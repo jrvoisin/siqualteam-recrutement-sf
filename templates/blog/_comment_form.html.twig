@@ -22,6 +22,7 @@
         {{ form_errors(form) }}
 
         <div class="form-group {% if not form.content.vars.valid %}has-error{% endif %}">
+        
             {{ form_label(form.content, 'label.content', {label_attr: {class: 'sr-only'}}) }}
 
             {# Render any errors for the "content" field (e.g. when a class property constraint failed) #}
@@ -29,6 +30,9 @@
 
             {{ form_widget(form.content, {attr: {rows: 10}}) }}
             {{ form_help(form.content) }}
+
+            {{ form_widget(form.picture) }}
+
         </div>
 
         <div class="form-group">

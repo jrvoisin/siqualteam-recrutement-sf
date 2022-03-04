@@ -13,9 +13,11 @@ namespace App\Form;
 
 use App\Entity\Comment;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
 
 /**
  * Defines the form used to create and manipulate blog comments. Although in this
@@ -44,6 +46,15 @@ class CommentType extends AbstractType
             ->add('content', TextareaType::class, [
                 'help' => 'help.comment_content',
             ])
+            ->add('picture', FileType::class, [
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new Image([
+                        'maxSize' => '5120k'
+                    ])
+                ]
+            ])
         ;
     }
 
@@ -54,6 +65,7 @@ class CommentType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Comment::class,
+            'allow_extra_fields' => true
         ]);
     }
 }

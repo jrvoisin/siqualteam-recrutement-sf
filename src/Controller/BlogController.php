@@ -116,6 +116,9 @@ class BlogController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            //TO BE CONTINUED
+            $pictureFile = $form->get('picture')->getData();
+
             $moderationLevel = $config->getModerationLevel();
 
             if ($moderationLevel === 0) $comment->setAllowed(true);
