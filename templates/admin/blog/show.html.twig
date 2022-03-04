@@ -17,6 +17,41 @@
     {{ post.content|markdown_to_html|sanitize_html }}
 
     {{ include('blog/_post_tags.html.twig') }}
+
+    <h3>
+        <i class="fa fa-comments" aria-hidden="true"></i> {{ 'post.num_comments'|trans({ 'count': post.comments|length }) }}
+    </h3>
+    {% for comment in post.comments %}
+        
+        <div class="row post-comment">
+            <a name="comment_{{ comment.id }}"></a>
+            <h5 class="col-sm-3">
+                <strong>{{ comment.author.fullName }}</strong> {{ 'post.commented_on'|trans }}
+                <strong>{{ comment.publishedAt|format_datetime('medium', 'short', '', 'UTC') }}</strong><br><br>
+                {% if comment.allowed %}
+                    <span class="text-success">Approuvé par <strong>{{ comment.allowedBy.fullName ?? 'serveur'}}</strong>
+                    le <strong>{{ comment.allowedAt|format_datetime('medium', 'short', '', 'UTC') }}</strong></span>
+                {% else %} 
+                    <span class="text-danger">Non approuvé</span>
+                {% endif %}
+            </h5>
+            <div class="col-sm-6">
+                {{ comment.content|markdown_to_html|sanitize_html }}
+            </div>
+            <div class="col-sm-3">
+                {% if comment.allowed %}
+                    <a href="{{ path('admin_comm_action', {id_post: post.id, id_comment: comment.id, action: 'disallow'}) }}" class="btn btn-sm btn-danger">
+                        <i class="fas fa-times" aria-hidden="true"></i> Refuser
+                    </a>
+                {% else %}
+                    <a href="{{ path('admin_comm_action', {id_post: post.id, id_comment: comment.id, action: 'allow'}) }}" class="btn btn-sm btn-success">
+                        <i class="fas fa-check" aria-hidden="true"></i> Autoriser
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    
+    {% endfor %}
 {% endblock %}
 
 {% block sidebar %}

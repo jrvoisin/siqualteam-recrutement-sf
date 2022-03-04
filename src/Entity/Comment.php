@@ -87,6 +87,12 @@ class Comment
      */
     private $allowedBy;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $allowedAt;
+    
+
     public function __construct()
     {
         $this->allowed = false;
@@ -169,4 +175,25 @@ class Comment
     {
         $this->allowedBy = $allowedBy;
     }
+
+    public function removeAllowedBy(): void
+    {
+        $this->allowedBy = null;
+    }
+
+    public function getAllowedAt(): ?\DateTimeInterface
+    {
+        return $this->allowedAt;
+    }
+
+    public function setAllowedAt(?\DateTimeInterface $allowedAt): void
+    {
+        $this->allowedAt = $allowedAt;
+    }
+
+    public function removeAllowedAt(): void
+    {
+        $this->allowedAt = null;
+    }
+
 }

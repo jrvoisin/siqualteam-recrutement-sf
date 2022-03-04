@@ -11,6 +11,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Comment;
 use App\Entity\Post;
 use App\Form\ConfigType;
 use App\Form\PostType;
@@ -18,6 +19,7 @@ use App\Repository\ConfigRepository;
 use App\Repository\PostRepository;
 use App\Security\PostVoter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
@@ -142,6 +144,37 @@ class BlogController extends AbstractController
         return $this->render('admin/blog/show.html.twig', [
             'post' => $post,
         ]);
+    }
+
+    /**
+     * Allow or disallow a comment.
+     *
+     * @Route("/{id_post<\d+>}/{id_comment<\d+>}/{action<allow|disallow>}", methods="GET", name="admin_comm_action")
+     * @ParamConverter("post", options={"mapping": {"id_post": "id"}})
+     * @ParamConverter("comment", options={"mapping": {"id_comment": "id"}})
+     */
+    public function moderateComment(Post $post, Comment $comment, string $action): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        if ($action == 'allow') {
+
+            $comment->setAllowed(true);
+            $comment->setAllowedBy($this->getUser());
+            $comment->setAllowedAt(new \DateTime());
+
+        }else {
+
+            $comment->setAllowed(false);
+            $comment->removeAllowedBy(null);
+            $comment->removeAllowedAt(null);
+
+        }
+        
+        $em->persist($comment);
+        $em->flush();
+
+        return $this->redirectToRoute('admin_post_show', ['id' => $post->getId()]);
     }
 
     /**
