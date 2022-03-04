@@ -145,7 +145,7 @@ class BlogController extends AbstractController
      */
     public function search(Request $request, PostRepository $posts): Response
     {
-        $query = $request->query->get('q', '');
+        $query = $request->query->get('search', '');
         $limit = $request->query->get('l', 10);
 
         if (!$request->isXmlHttpRequest()) {
