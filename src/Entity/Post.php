@@ -61,6 +61,8 @@ class Post
 
     /**
      * @var string
+     * 
+     * @ORM\Column(type="text")
      */
     private $summary;
 
